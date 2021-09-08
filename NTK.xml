@@ -1,0 +1,89 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>NTK</name>
+    </assembly>
+    <members>
+        <member name="T:NTK.App">
+            <summary>
+            Interaction logic for App.xaml
+            </summary>
+            <summary>
+            App
+            </summary>
+        </member>
+        <member name="M:NTK.App.InitializeComponent">
+            <summary>
+            InitializeComponent
+            </summary>
+        </member>
+        <member name="M:NTK.App.Main">
+            <summary>
+            Application Entry Point.
+            </summary>
+        </member>
+        <member name="T:NTK.Startup">
+            <summary>
+            Interaction logic for MainWindow.xaml
+            </summary>
+            <summary>
+            Startup
+            </summary>
+        </member>
+        <member name="M:NTK.Startup.CheckConfig">
+            <summary>
+            Check Configuration File config.json.
+            </summary>
+        </member>
+        <member name="M:NTK.Startup.FixFolders">
+            <summary>
+            Create logs folders if not exist.
+            </summary>
+        </member>
+        <member name="M:NTK.Startup.CheckLogin">
+            <summary>
+            Check login, if exist just consume the save file, if not then create a new file.
+            </summary>
+        </member>
+        <member name="M:NTK.Startup.UpdateTimeConsumed(NTK.TimeConsumed)">
+            <summary>
+            Update Time Consumed File
+            </summary>
+            <param name="conf">the time consumed</param>
+        </member>
+        <member name="M:NTK.Startup.TimerTick_Tick(System.Object,System.EventArgs)">
+            <summary>
+            Updates running time every seconds. if time exceeds the time limit, display the UI and start the countdown timer.
+            </summary>
+            <param name="sender"></param>
+            <param name="e"></param>
+        </member>
+        <member name="M:NTK.Startup.Window_Closing(System.Object,System.ComponentModel.CancelEventArgs)">
+            <summary>
+            Prevents the user to cancel the window
+            </summary>
+            <param name="sender"></param>
+            <param name="e"></param>
+        </member>
+        <member name="M:NTK.Startup.InitializeComponent">
+            <summary>
+            InitializeComponent
+            </summary>
+        </member>
+        <member name="P:NTK.TimeConsumed.Time">
+            <summary>
+            The current time
+            </summary>
+        </member>
+        <member name="P:NTK.Config.Limit">
+            <summary>
+            The time limits
+            </summary>
+        </member>
+        <member name="P:NTK.Config.Message">
+            <summary>
+            The message
+            </summary>
+        </member>
+    </members>
+</doc>

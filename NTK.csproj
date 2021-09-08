@@ -1,0 +1,33 @@
+﻿<Project Sdk="Microsoft.NET.Sdk.WindowsDesktop">
+
+  <PropertyGroup>
+	<OutputType>WinExe</OutputType>
+	<TargetFramework>netcoreapp3.1</TargetFramework>
+	<UseWPF>true</UseWPF>
+	<Version>1.0</Version>
+	<RootNamespace>NTK</RootNamespace>
+	<AssemblyName>NTK</AssemblyName>
+    <RuntimeIdentifier>win-x64</RuntimeIdentifier>
+    <StartupObject>NTK.App</StartupObject>
+    <ApplicationIcon>icons8-shutdown-96.ico</ApplicationIcon>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
+    <Optimize>false</Optimize>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
+    <DocumentationFile>C:\Users\elmerhd\Documents\GitHub\NTK\NTK.xml</DocumentationFile>
+  </PropertyGroup>
+
+  <ItemGroup> 
+    <PackageReference Include="Newtonsoft.Json" Version="13.0.1" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Resource Include="icons8-shutdown-96.ico">
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+    </Resource>
+  </ItemGroup>
+
+</Project>
