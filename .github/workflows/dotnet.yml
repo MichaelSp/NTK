@@ -4,6 +4,8 @@ on:
   push:
     branches:
       - master
+    tags:
+      - "ntk/v*"
 env:
   PROJECT_PATH: NTK.csproj
 
@@ -28,8 +30,8 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          tag_name: ${{ github.ref }}
-          release_name: ${{ github.ref }}
+          tag_name: ${{ steps.vars.outputs.tag }}
+          release_name: ${{ steps.vars.outputs.tag }}
 
       - uses: csexton/release-asset-action@v2
         with:
