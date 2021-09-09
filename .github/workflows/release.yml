@@ -1,4 +1,4 @@
-name: "release-exe"
+name: "release-single-exe"
 
 on:
   push:
