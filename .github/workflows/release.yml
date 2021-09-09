@@ -1,9 +1,11 @@
-name: "release-single-exe"
+name: "publish-single-executable"
 
 on:
+  # Trigger the workflow on push or pull request,
+  # but only for the main branch
   push:
-    tags:
-      - 'v*' # Push events to matching v*, i.e. v1.0, v20.15.10
+    branches:
+      - master
 env:
   PROJECT_PATH: NTK.csproj
 
