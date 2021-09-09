@@ -62,7 +62,7 @@ namespace NTK
         /// </summary>
         public void CheckConfig()
         {
-            configFile = new FileInfo(@"config.json");
+            configFile = new FileInfo(@"ntk-config.json");
             if (configFile.Exists)
             {
                 Config = JsonConvert.DeserializeObject<Config>(File.ReadAllText(configFile.FullName));
