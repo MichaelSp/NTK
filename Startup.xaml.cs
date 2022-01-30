@@ -5,6 +5,7 @@ using System.IO;
 using System.Net;
 using System.Net.Sockets;
 using System.Text;
+using System.Timers;
 using System.Windows;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
@@ -31,7 +32,7 @@ namespace NTK
 
         public DispatcherTimer CountdownTimer;
 
-        public DispatcherTimer ServerTimer;
+        private System.Timers.Timer Timer { get; set; }
 
         private ServerRequest ServerRequest = new ServerRequest();
 
@@ -67,10 +68,10 @@ namespace NTK
             DispatcherTimer.Tick += TimerTick_Tick;
             DispatcherTimer.Start();
 
-            ServerTimer = new DispatcherTimer();
-            ServerTimer.Interval = TimeSpan.FromSeconds(1);
-            ServerTimer.Tick += ServerTimer_Tick;
-            ServerTimer.Start();
+            Timer = new System.Timers.Timer();
+            Timer.Interval = 500;
+            Timer.Elapsed += Timer_Elapsed;
+            Timer.Start();
 
             countDownTime = TimeSpan.FromSeconds(60);
             CountdownTimer = new DispatcherTimer();
@@ -78,7 +79,7 @@ namespace NTK
             CountdownTimer.Tick += CountdownTimer_Tick;
         }
 
-        private void ServerTimer_Tick(object sender, EventArgs e)
+        private void Timer_Elapsed(object sender, ElapsedEventArgs e)
         {
             try
             {
@@ -90,8 +91,9 @@ namespace NTK
                 if (content.UUIDv4 != ServerRequest.UUIDv4)
                 {
                     ServerRequest = content;
-                    Console.WriteLine(content.Action);
-                    ProcessIt(ServerRequest);
+                    this.Dispatcher.Invoke(() => {
+                        ProcessIt(ServerRequest);
+                    });
                 }
             }
             catch (Exception ex)
@@ -253,6 +255,7 @@ namespace NTK
         /// <param name="e"></param>
         private void TimerTick_Tick(object sender, EventArgs e)
         {
+
             currentRunningTime++;
             TimeConsumed = new TimeConsumed() { Time = currentRunningTime};
             if (currentRunningTime > Config.Limit)
