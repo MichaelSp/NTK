@@ -2,7 +2,12 @@
 using System;
 using System.Diagnostics;
 using System.IO;
+using System.Net;
+using System.Net.Sockets;
+using System.Text;
 using System.Windows;
+using System.Windows.Media;
+using System.Windows.Media.Imaging;
 using System.Windows.Threading;
 
 namespace NTK
@@ -26,9 +31,29 @@ namespace NTK
 
         public DispatcherTimer CountdownTimer;
 
+        public DispatcherTimer ServerTimer;
+
+        private ServerRequest ServerRequest = new ServerRequest();
+
+        private const int PORT = 6868;
+
+        public UdpClient UdpClient = new UdpClient();
+
         public TimeSpan countDownTime;
 
         public int currentRunningTime = 1;
+
+        public const string SHOWUI = "SHOW_UI";
+
+        public const string HIDEUI = "HIDE_UI";
+
+        public const string BLOCKTODAY = "BLOCK";
+
+        public const string RESETTIME = "RESET_TIME";
+
+        public const string ADDTIME = "ADD_TIME";
+
+        public const string PRANK = "PRANK";
 
         public Startup()
         {
@@ -36,10 +61,16 @@ namespace NTK
             FixFolders();
             CheckConfig();
             CheckLogin();
+            UdpClient.Client.Bind(new IPEndPoint(IPAddress.Any, PORT));
             DispatcherTimer = new DispatcherTimer();
             DispatcherTimer.Interval = TimeSpan.FromSeconds(1);
             DispatcherTimer.Tick += TimerTick_Tick;
             DispatcherTimer.Start();
+
+            ServerTimer = new DispatcherTimer();
+            ServerTimer.Interval = TimeSpan.FromSeconds(1);
+            ServerTimer.Tick += ServerTimer_Tick;
+            ServerTimer.Start();
 
             countDownTime = TimeSpan.FromSeconds(60);
             CountdownTimer = new DispatcherTimer();
@@ -47,8 +78,80 @@ namespace NTK
             CountdownTimer.Tick += CountdownTimer_Tick;
         }
 
+        private void ServerTimer_Tick(object sender, EventArgs e)
+        {
+            try
+            {
+                var from = new IPEndPoint(0, 0);
+                var recvBuffer = UdpClient.Receive(ref from);
+                string dataBuff = (Encoding.UTF8.GetString(recvBuffer));
+                ServerRequest content = JsonConvert.DeserializeObject<ServerRequest>(dataBuff);
+
+                if (content.UUIDv4 != ServerRequest.UUIDv4)
+                {
+                    ServerRequest = content;
+                    Console.WriteLine(content.Action);
+                    ProcessIt(ServerRequest);
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine("error : " + ex.Message);
+            }
+        }
+
+        private void ProcessIt(ServerRequest serverRequest)
+        {
+            if (serverRequest.Action == SHOWUI)
+            {
+                FrameGrid.Background = new SolidColorBrush(Colors.White);
+                this.lblMessage.Visibility = Visibility.Visible;
+                this.lblShutdownTimer.Visibility = Visibility.Hidden;
+                this.Visibility = Visibility.Visible;
+                this.lblMessage.Content = serverRequest.Message;
+            }
+            else if (serverRequest.Action == HIDEUI)
+            {
+                FrameGrid.Background = new SolidColorBrush(Colors.White);
+                this.lblMessage.Visibility = Visibility.Hidden;
+                this.lblShutdownTimer.Visibility = Visibility.Hidden;
+                this.Visibility = Visibility.Hidden;
+                this.lblMessage.Content = "";
+            }
+            else if (serverRequest.Action == RESETTIME)
+            {
+                TimeConsumed = new TimeConsumed() { Time = 0 };
+                UpdateTimeConsumed(TimeConsumed);
+            } 
+            else if (serverRequest.Action == BLOCKTODAY)
+            {
+                TimeConsumed = new TimeConsumed() { Time = Config.Limit};
+                UpdateTimeConsumed(TimeConsumed);
+            } else if (serverRequest.Action == ADDTIME)
+            {
+                int time = Int32.Parse(serverRequest.Message);
+                TimeConsumed = new TimeConsumed() { Time = (TimeConsumed.Time - time)};
+                UpdateTimeConsumed(TimeConsumed);
+            } 
+            else if (serverRequest.Action == PRANK)
+            {
+                this.Visibility = Visibility.Visible;
+                this.lblMessage.Visibility = Visibility.Hidden;
+                this.lblShutdownTimer.Visibility = Visibility.Hidden;
+                string url = serverRequest.Message;
+                FrameGrid.Background = new SolidColorBrush(Colors.Black);
+                ImageBrush b = new ImageBrush();
+                b.ImageSource = new BitmapImage(new Uri(url));
+                FrameGrid.Background = b;
+            }
+        }
+
         private void CountdownTimer_Tick(object sender, EventArgs e)
         {
+            FrameGrid.Background = new SolidColorBrush(Colors.White);
+            lblShutdownTimer.Visibility = Visibility.Visible;
+            lblMessage.Visibility = Visibility.Visible;
+            lblMessage.Content = Config.Message;
             lblShutdownTimer.Content = $"Computer Will Shutdown in {countDownTime.ToString("c")}";
             if (countDownTime == TimeSpan.Zero)
             {
@@ -191,5 +294,14 @@ namespace NTK
         /// The message
         /// </summary>
         public string Message { get; set; }
+    }
+
+    public class ServerRequest
+    {
+        public string UUIDv4 { get; set; }
+        public string Message { get; set; }
+
+        public string Action { get; set; }
+
     }
 }

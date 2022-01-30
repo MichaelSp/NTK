@@ -3,7 +3,9 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 16
 VisualStudioVersion = 16.0.31624.102
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NTK", "NTK.csproj", "{F634642A-2F41-443C-97DD-0BBD8AC4328D}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NTK", "NTK.csproj", "{F634642A-2F41-443C-97DD-0BBD8AC4328D}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NTK Android", "..\NTK Android\NTK Android.csproj", "{5D95F155-2D97-4F5A-B015-D39079A4A2CD}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -15,6 +17,12 @@ Global
 		{F634642A-2F41-443C-97DD-0BBD8AC4328D}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{F634642A-2F41-443C-97DD-0BBD8AC4328D}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{F634642A-2F41-443C-97DD-0BBD8AC4328D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{5D95F155-2D97-4F5A-B015-D39079A4A2CD}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{5D95F155-2D97-4F5A-B015-D39079A4A2CD}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{5D95F155-2D97-4F5A-B015-D39079A4A2CD}.Debug|Any CPU.Deploy.0 = Debug|Any CPU
+		{5D95F155-2D97-4F5A-B015-D39079A4A2CD}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{5D95F155-2D97-4F5A-B015-D39079A4A2CD}.Release|Any CPU.Build.0 = Release|Any CPU
+		{5D95F155-2D97-4F5A-B015-D39079A4A2CD}.Release|Any CPU.Deploy.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

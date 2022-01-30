@@ -17,7 +17,7 @@
         Height="600"
         Closing="Window_Closing"
         Width="800">
-    <Grid>
+    <Grid x:Name="FrameGrid">
         <Label x:Name="lblMessage"  HorizontalContentAlignment="Center" Content="Message" Margin="10,10,10,0" FontFamily="Consolas" FontSize="48" Height="83" VerticalAlignment="Top"/>
         <Label x:Name="lblShutdownTimer"  HorizontalContentAlignment="Center" Content="Timer" Margin="10,0,10,10" FontFamily="Consolas" FontSize="48" Height="83" VerticalAlignment="Bottom"/>
     </Grid>
