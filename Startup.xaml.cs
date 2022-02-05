@@ -87,7 +87,7 @@ namespace NTK
             CountdownTimer.Tick += CountdownTimer_Tick;
 
             BlockSitesTimer = new Timer();
-            BlockSitesTimer.Interval = 1;
+            BlockSitesTimer.Interval = 1000;
             BlockSitesTimer.Elapsed += BlockSitesTimerElapsed;
             BlockSitesTimer.Start();
         }
