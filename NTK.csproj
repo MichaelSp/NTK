@@ -30,4 +30,10 @@
     </Resource>
   </ItemGroup>
 
+  <ItemGroup>
+    <None Update="block.txt">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+
 </Project>

@@ -1,5 +1,6 @@
 ﻿using Newtonsoft.Json;
 using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Net;
@@ -7,6 +8,7 @@ using System.Net.Sockets;
 using System.Text;
 using System.Timers;
 using System.Windows;
+using System.Windows.Automation;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Threading;
@@ -32,7 +34,10 @@ namespace NTK
 
         public DispatcherTimer CountdownTimer;
 
-        private System.Timers.Timer Timer { get; set; }
+        public Timer BlockSitesTimer;
+
+        private Timer ServerTimer { get; set; }
+
 
         private ServerRequest ServerRequest = new ServerRequest();
 
@@ -40,9 +45,9 @@ namespace NTK
 
         public UdpClient UdpClient = new UdpClient();
 
-        public TimeSpan countDownTime;
+        public TimeSpan CountDownTime;
 
-        public int currentRunningTime = 1;
+        public int CurrentRunningTime = 1;
 
         public const string SHOWUI = "SHOW_UI";
 
@@ -56,30 +61,76 @@ namespace NTK
 
         public const string PRANK = "PRANK";
 
+        public List<string> BlockSites = new List<string>();
+
         public Startup()
         {
             InitializeComponent();
             FixFolders();
             CheckConfig();
             CheckLogin();
+            ReadBlockSites();
             UdpClient.Client.Bind(new IPEndPoint(IPAddress.Any, PORT));
             DispatcherTimer = new DispatcherTimer();
             DispatcherTimer.Interval = TimeSpan.FromSeconds(1);
             DispatcherTimer.Tick += TimerTick_Tick;
             DispatcherTimer.Start();
 
-            Timer = new System.Timers.Timer();
-            Timer.Interval = 500;
-            Timer.Elapsed += Timer_Elapsed;
-            Timer.Start();
+            ServerTimer = new Timer();
+            ServerTimer.Interval = 500;
+            ServerTimer.Elapsed += ServerTimerElapsed;
+            ServerTimer.Start();
 
-            countDownTime = TimeSpan.FromSeconds(60);
+            CountDownTime = TimeSpan.FromSeconds(60);
             CountdownTimer = new DispatcherTimer();
             CountdownTimer.Interval = TimeSpan.FromSeconds(1);
             CountdownTimer.Tick += CountdownTimer_Tick;
+
+            BlockSitesTimer = new Timer();
+            BlockSitesTimer.Interval = 4;
+            BlockSitesTimer.Elapsed += BlockSitesTimerElapsed;
+            BlockSitesTimer.Start();
         }
 
-        private void Timer_Elapsed(object sender, ElapsedEventArgs e)
+        private void BlockSitesTimerElapsed(object sender, ElapsedEventArgs e)
+        {
+            Process[] procsEdge = Process.GetProcessesByName("msedge");
+            foreach (Process Edge in procsEdge)
+            {
+                if (Edge.MainWindowHandle != IntPtr.Zero)
+                {
+                    AutomationElement root = AutomationElement.FromHandle(Edge.MainWindowHandle);
+                    var tabs = root.FindAll(TreeScope.Descendants, new PropertyCondition(AutomationElement.ControlTypeProperty, ControlType.TabItem));
+                    var elmUrl = root.FindFirst(TreeScope.Descendants, new PropertyCondition(AutomationElement.NameProperty, "Address and search bar"));
+                    foreach (AutomationElement tabitem in tabs)
+                    {
+                        if (elmUrl != null)
+                        {
+                            AutomationPattern[] patterns = elmUrl.GetSupportedPatterns();
+                            if (patterns.Length > 0)
+                            {
+                                ValuePattern val = (ValuePattern)elmUrl.GetCurrentPattern(patterns[0]);
+                                string url = val.Current.Value;
+                                bool block = BlockSites.Contains(url);
+                                if (block)
+                                {
+                                    this.Dispatcher.Invoke(() => {
+                                        Block();
+                                    });
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        public void ReadBlockSites()
+        {
+            BlockSites.AddRange(File.ReadLines(@"block.txt"));
+        }
+
+        private void ServerTimerElapsed(object sender, ElapsedEventArgs e)
         {
             try
             {
@@ -100,6 +151,15 @@ namespace NTK
             {
                 Console.WriteLine("error : " + ex.Message);
             }
+        }
+
+        private void Block()
+        {
+            FrameGrid.Background = new SolidColorBrush(Colors.White);
+            this.lblMessage.Visibility = Visibility.Visible;
+            this.lblMessage.Content = $"you are block because of entering prohibited web sites.";
+            this.lblShutdownTimer.Visibility = Visibility.Hidden;
+            this.Visibility = Visibility.Visible;
         }
 
         private void ProcessIt(ServerRequest serverRequest)
@@ -148,18 +208,19 @@ namespace NTK
             }
         }
 
+
         private void CountdownTimer_Tick(object sender, EventArgs e)
         {
             FrameGrid.Background = new SolidColorBrush(Colors.White);
             lblShutdownTimer.Visibility = Visibility.Visible;
             lblMessage.Visibility = Visibility.Visible;
             lblMessage.Content = Config.Message;
-            lblShutdownTimer.Content = $"Computer Will Shutdown in {countDownTime.ToString("c")}";
-            if (countDownTime == TimeSpan.Zero)
+            lblShutdownTimer.Content = $"Computer Will Shutdown in {CountDownTime.ToString("c")}";
+            if (CountDownTime == TimeSpan.Zero)
             {
                 Process.Start("Shutdown", "-s -t 1");
             }
-            countDownTime = countDownTime.Add(TimeSpan.FromSeconds(-1));
+            CountDownTime = CountDownTime.Add(TimeSpan.FromSeconds(-1));
         }
 
         /// <summary>
@@ -220,7 +281,7 @@ namespace NTK
                 }
                 else
                 {
-                    currentRunningTime = TimeConsumed.Time;
+                    CurrentRunningTime = TimeConsumed.Time;
                 }
             }
             else
@@ -256,9 +317,9 @@ namespace NTK
         private void TimerTick_Tick(object sender, EventArgs e)
         {
 
-            currentRunningTime++;
-            TimeConsumed = new TimeConsumed() { Time = currentRunningTime};
-            if (currentRunningTime > Config.Limit)
+            CurrentRunningTime++;
+            TimeConsumed = new TimeConsumed() { Time = CurrentRunningTime};
+            if (CurrentRunningTime > Config.Limit)
             {
                 this.Visibility = Visibility.Visible;
                 CountdownTimer.Start();
