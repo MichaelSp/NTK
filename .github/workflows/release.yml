@@ -7,7 +7,7 @@ on:
     branches:
       - master
 env:
-  PROJECT_PATH: NTK.csproj
+  PROJECT_PATH: client/NTK.csproj
 
 jobs:
   deploy:

@@ -55,15 +55,15 @@
             <summary>
             Updates running time every seconds. if time exceeds the time limit, display the UI and start the countdown timer.
             </summary>
-            <param name="sender"></param>
-            <param name="e"></param>
+            <param name="sender"/>
+            <param name="e"/>
         </member>
         <member name="M:NTK.Startup.Window_Closing(System.Object,System.ComponentModel.CancelEventArgs)">
             <summary>
             Prevents the user to cancel the window
             </summary>
-            <param name="sender"></param>
-            <param name="e"></param>
+            <param name="sender"/>
+            <param name="e"/>
         </member>
         <member name="M:NTK.Startup.InitializeComponent">
             <summary>
