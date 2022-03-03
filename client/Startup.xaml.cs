@@ -91,12 +91,12 @@ namespace NTK
             CountdownTimer.Tick += CountdownTimer_Tick;
 
             BlockSitesTimer = new Timer();
-            BlockSitesTimer.Interval = 1000;
+            BlockSitesTimer.Interval = 1000; // every second
             BlockSitesTimer.Elapsed += BlockSitesTimerElapsed;
             BlockSitesTimer.Start();
 
             UdpTimer = new Timer();
-            UdpTimer.Interval = 10000;
+            UdpTimer.Interval = 60000; // every minute
             UdpTimer.Elapsed += UdpTimerElapsed;
             UdpTimer.Start();
         }
@@ -270,7 +270,7 @@ namespace NTK
             }
             else
             {
-                Config = new Config() { Limit = 10800, Message = "You have used your alloted time for today, Come back tomorrow." };
+                Config = new Config() { Limit = 10800, Message = "You have used your allotted time for today. Come back tomorrow." };
                 JsonSerializer serializer = new JsonSerializer();
                 serializer.NullValueHandling = NullValueHandling.Ignore;
                 serializer.Formatting = Formatting.Indented;
