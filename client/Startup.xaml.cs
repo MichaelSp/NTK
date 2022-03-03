@@ -20,7 +20,9 @@ namespace NTK
     /// </summary>
     public partial class Startup : Window
     {
-        public string LogsFolder = @"logs";
+        public static string AppRoot = $@"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\NTK";
+
+        public string LogsFolder = $@"{AppRoot}\logs";
 
         public TimeConsumed TimeConsumed;
 
@@ -33,6 +35,8 @@ namespace NTK
         public DispatcherTimer DispatcherTimer;
 
         public DispatcherTimer CountdownTimer;
+
+        public Timer UdpTimer;
 
         public Timer BlockSitesTimer;
 
@@ -90,6 +94,30 @@ namespace NTK
             BlockSitesTimer.Interval = 1000;
             BlockSitesTimer.Elapsed += BlockSitesTimerElapsed;
             BlockSitesTimer.Start();
+
+            UdpTimer = new Timer();
+            UdpTimer.Interval = 10000;
+            UdpTimer.Elapsed += UdpTimerElapsed;
+            UdpTimer.Start();
+        }
+
+        private void UdpTimerElapsed(object sender, ElapsedEventArgs e)
+        {
+            HelloEvent evt = new HelloEvent();
+            evt.Uptime = TimeConsumed.Time.ToString();
+            evt.User = System.Security.Principal.WindowsIdentity.GetCurrent().Name;
+
+            byte[] sendBytes = Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(evt).ToCharArray());
+
+            Console.WriteLine(sendBytes.ToString());
+            try
+            {
+                UdpClient.Send(sendBytes, sendBytes.Length, "255.255.255.255", 6868);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.ToString());
+            }
         }
 
         private void BlockSitesTimerElapsed(object sender, ElapsedEventArgs e)
@@ -114,7 +142,8 @@ namespace NTK
                                 bool block = BlockSites.Contains(url);
                                 if (block)
                                 {
-                                    this.Dispatcher.Invoke(() => {
+                                    this.Dispatcher.Invoke(() =>
+                                    {
                                         Block();
                                     });
                                 }
@@ -127,7 +156,10 @@ namespace NTK
 
         public void ReadBlockSites()
         {
-            BlockSites.AddRange(File.ReadLines(@"block.txt"));
+            if (File.Exists($@"{Startup.AppRoot}\block.txt"))
+            {
+                BlockSites.AddRange(File.ReadLines($@"{Startup.AppRoot}\block.txt"));
+            }
         }
 
         private void ServerTimerElapsed(object sender, ElapsedEventArgs e)
@@ -142,7 +174,8 @@ namespace NTK
                 if (content.UUIDv4 != ServerRequest.UUIDv4)
                 {
                     ServerRequest = content;
-                    this.Dispatcher.Invoke(() => {
+                    this.Dispatcher.Invoke(() =>
+                    {
                         ProcessIt(ServerRequest);
                     });
                 }
@@ -184,17 +217,18 @@ namespace NTK
             {
                 TimeConsumed = new TimeConsumed() { Time = 0 };
                 UpdateTimeConsumed(TimeConsumed);
-            } 
+            }
             else if (serverRequest.Action == BLOCKTODAY)
             {
-                TimeConsumed = new TimeConsumed() { Time = Config.Limit};
+                TimeConsumed = new TimeConsumed() { Time = Config.Limit };
                 UpdateTimeConsumed(TimeConsumed);
-            } else if (serverRequest.Action == ADDTIME)
+            }
+            else if (serverRequest.Action == ADDTIME)
             {
                 int time = Int32.Parse(serverRequest.Message);
-                TimeConsumed = new TimeConsumed() { Time = (TimeConsumed.Time - time)};
+                TimeConsumed = new TimeConsumed() { Time = (TimeConsumed.Time - time) };
                 UpdateTimeConsumed(TimeConsumed);
-            } 
+            }
             else if (serverRequest.Action == PRANK)
             {
                 this.Visibility = Visibility.Visible;
@@ -228,15 +262,15 @@ namespace NTK
         /// </summary>
         public void CheckConfig()
         {
-            configFile = new FileInfo(@"ntk-config.json");
+            configFile = new FileInfo($@"{AppRoot}\ntk-config.json");
             if (configFile.Exists)
             {
                 Config = JsonConvert.DeserializeObject<Config>(File.ReadAllText(configFile.FullName));
                 lblMessage.Content = Config.Message;
-            } 
+            }
             else
             {
-                Config = new Config() { Limit= 10800, Message= "You have used your alloted time for today, Come back tomorrow." };
+                Config = new Config() { Limit = 10800, Message = "You have used your alloted time for today, Come back tomorrow." };
                 JsonSerializer serializer = new JsonSerializer();
                 serializer.NullValueHandling = NullValueHandling.Ignore;
                 serializer.Formatting = Formatting.Indented;
@@ -259,10 +293,7 @@ namespace NTK
             {
                 Directory.CreateDirectory(LogsFolder);
             }
-            if (!Directory.Exists($@"{LogsFolder}/{Environment.UserName}"))
-            {
-                Directory.CreateDirectory($@"{LogsFolder}/{Environment.UserName}");
-            }
+            new StreamWriter($"{LogsFolder}/{DateTime.Now.ToString("MM_dd_yyyy")}.log").WriteLine("Application Start");
         }
 
         /// <summary>
@@ -270,13 +301,13 @@ namespace NTK
         /// </summary>
         public void CheckLogin()
         {
-            timeConsumedFile = new FileInfo($"{LogsFolder}/{Environment.UserName}/{DateTime.Now.ToString("MM_dd_yyyy")}.json");
+            timeConsumedFile = new FileInfo($"{LogsFolder}/{DateTime.Now.ToString("MM_dd_yyyy")}.json");
             if (timeConsumedFile.Exists)
             {
                 TimeConsumed = JsonConvert.DeserializeObject<TimeConsumed>(File.ReadAllText(timeConsumedFile.FullName));
                 if (TimeConsumed == null)
                 {
-                    TimeConsumed = new TimeConsumed() { Time = Config.Limit/2 };
+                    TimeConsumed = new TimeConsumed() { Time = Config.Limit / 2 };
                     UpdateTimeConsumed(TimeConsumed);
                 }
                 else
@@ -286,7 +317,7 @@ namespace NTK
             }
             else
             {
-                TimeConsumed = new TimeConsumed() { Time = 0};
+                TimeConsumed = new TimeConsumed() { Time = 0 };
                 UpdateTimeConsumed(TimeConsumed);
             }
         }
@@ -318,7 +349,7 @@ namespace NTK
         {
 
             CurrentRunningTime++;
-            TimeConsumed = new TimeConsumed() { Time = CurrentRunningTime};
+            TimeConsumed = new TimeConsumed() { Time = CurrentRunningTime };
             if (CurrentRunningTime > Config.Limit)
             {
                 this.Visibility = Visibility.Visible;
@@ -366,6 +397,13 @@ namespace NTK
         public string Message { get; set; }
 
         public string Action { get; set; }
+
+    }
+    public class HelloEvent
+    {
+        public string User { get; set; }
+
+        public string Uptime { get; set; }
 
     }
 }
