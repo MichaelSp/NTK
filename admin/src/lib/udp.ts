@@ -1,4 +1,4 @@
-import { User } from "./db";
+import { User } from "$lib/db";
 import * as dgram from "dgram";
 
 class Hello {
@@ -19,7 +19,7 @@ udpServer.on("message", async (msg: Buffer, rinfo) => {
       username: hello.User,
       uptime_seconds: hello.Uptime,
       ip: rinfo.address
-    }, { where: { username: hello.User } }
+    }
   );
   console.log(`server got: ${msg} from ${rinfo.address}:${rinfo.port}`);
 });

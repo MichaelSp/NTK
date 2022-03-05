@@ -364,3 +364,5 @@ FodyWeavers.xsd
 
 admin/build
 admin/database.sqlite
+
+.svelt-kit

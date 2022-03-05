@@ -1,10 +1,10 @@
-import { User }from "$lib/db";
-import type { RequestHandler } from "@sveltejs/kit";
+import {User} from "$lib/db";
 
-export async function get(): Promise<RequestHandler> {
-  const users = await User.findAll()
-
+export async function get(): Promise<{ body: any }> {
   return {
-    body: { users }
+    body: {
+      users: await User.findAll(),
+      errors: []
+    }
   };
 }

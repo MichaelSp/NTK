@@ -1,10 +1,8 @@
 <script lang="ts">
-	import Header from '$lib/header/Header.svelte';
 	import {Layout} from '@material-svelte/layout';
 	import '../app.css';
 </script>
 
-<Header/>
 
 <Layout>
 	<main>
