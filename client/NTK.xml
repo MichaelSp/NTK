@@ -22,6 +22,16 @@
             Application Entry Point.
             </summary>
         </member>
+        <member name="P:NTK.Config.Limit">
+            <summary>
+            The time limits
+            </summary>
+        </member>
+        <member name="P:NTK.Config.Message">
+            <summary>
+            The message
+            </summary>
+        </member>
         <member name="T:NTK.Startup">
             <summary>
             Interaction logic for MainWindow.xaml
@@ -45,11 +55,11 @@
             Check login, if exist just consume the save file, if not then create a new file.
             </summary>
         </member>
-        <member name="M:NTK.Startup.UpdateTimeConsumed(NTK.TimeConsumed)">
+        <member name="M:NTK.Startup.UpdateTimeConsumed(System.Int32)">
             <summary>
             Update Time Consumed File
             </summary>
-            <param name="conf">the time consumed</param>
+            <param name="newTime">the time consumed</param>
         </member>
         <member name="M:NTK.Startup.TimerTick_Tick(System.Object,System.EventArgs)">
             <summary>
@@ -73,16 +83,6 @@
         <member name="P:NTK.TimeConsumed.Time">
             <summary>
             The current time
-            </summary>
-        </member>
-        <member name="P:NTK.Config.Limit">
-            <summary>
-            The time limits
-            </summary>
-        </member>
-        <member name="P:NTK.Config.Message">
-            <summary>
-            The message
             </summary>
         </member>
     </members>
