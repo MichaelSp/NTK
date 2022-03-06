@@ -55,7 +55,7 @@ namespace NTK
             DispatcherTimer.Tick += TimerTick_Tick;
             DispatcherTimer.Start();
 
-            CountDownTime = TimeSpan.FromSeconds(60);
+            CountDownTime = TimeSpan.FromSeconds(10);
             CountdownTimer = new DispatcherTimer();
             CountdownTimer.Interval = TimeSpan.FromSeconds(1);
             CountdownTimer.Tick += CountdownTimer_Tick;
