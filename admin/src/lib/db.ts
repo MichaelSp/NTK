@@ -4,7 +4,7 @@ export const db = new Sequelize('sqlite://database.sqlite', {logging: false});
 export class User extends Model {
     declare username: string
     declare password: string
-    declare uptime_seconds: string
+    declare up_time: string
     declare ip: string
 }
 
@@ -18,6 +18,6 @@ User.init({
     password: {
         type: DataTypes.STRING
     },
-    uptime_seconds: DataTypes.INTEGER,
+    up_time: DataTypes.INTEGER,
     ip: DataTypes.STRING
 }, {sequelize: db, modelName: 'User'});

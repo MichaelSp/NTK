@@ -15,37 +15,47 @@ export async function get({params}): Promise<{ body?: any, status?: number }> {
     };
 }
 
-async function updateTime(data, username: string) {
-    const uptime_seconds = data.uptime_seconds
-    await User.update({
-        uptime_seconds,
-    }, {
-        where: {username},
-        fields: ['uptime_seconds']
-    })
-    return {status: 201, body: {uptime_seconds}};
-}
-
-async function prank(username: string, prank: string) {
-    let message = JSON.stringify({
-        Action: "PRANK",
-        Message: prank
-    })
+async function updateTime(time_delta: string | number, username: string) {
+    const delta = typeof time_delta === "string" ? parseInt(time_delta) : time_delta;
     const user = await User.findByPk(username)
 
-    UDP.sendMessage(user, message)
+    await User.update({
+        up_time: user.up_time + delta,
+    }, {
+        where: {username},
+        fields: ['up_time']
+    })
+
+    UDP.sendMessage(user, {Action: "ADD_TIME", Message: delta})
+
+    return {status: 201, body: {up_time: user.up_time + delta}};
+}
+
+async function showMessage(username: string, message: string, action: string = "SHOW_UI") {
+    const user = await User.findByPk(username)
+    UDP.sendMessage(user, {
+        Action: action,
+        Message: message
+    })
+    return {status: 200}
 }
 
 export async function post(p: { request: Request, params: { username?: string } }) {
     const data = await p.request.json()
     const username = p.params.username
     if (typeof username === "string") {
-
-        if (data.uptime_seconds) {
-            return await updateTime(data, username);
+        if (data.time_delta) {
+            return await updateTime(data.time_delta, username);
         }
-        if (data.prank) {
-            return await prank(username, data.prank)
+        if (data.showMessage) {
+            return await showMessage(username, data.showMessage)
+        }
+        if (data.hideUi){
+            UDP.sendMessage(await User.findByPk(username), {Action: "HIDE_UI"})
+            return {status: 200}
+        }
+        if (data.showImage) {
+            return await showMessage(username, data.showImage, "SHOW_IMAGE")
         }
     } else {
         return {status: 404}

@@ -4,99 +4,111 @@
     import {Icon} from "@material-svelte/icon";
     import {mdiMinus, mdiPlus, mdiTrashCan} from '@mdi/js';
     import {toTime} from "../../lib/utils";
+    import {API} from "../../lib/api";
+
+    let api = new API()
 
     export let user
     let addColor = "#334131"
     let subColor = "#7c5959"
 
     async function updateTime(mins: number) {
-        const body = {uptime_seconds: user.uptime_seconds + mins * 60}
-        const response = await fetch(`/users/${user.username}`, {
-            method: "POST",
-            body: JSON.stringify(body),
-            headers: {
-                accept: 'application/json'
-            }
-        });
-        const answer = await response.json()
-        user.uptime_seconds = answer.uptime_seconds
+        const body = {time_delta: mins * 60}
+        await api.post(`/users/${user.username}`, body)
     }
 
-    async function prank() {
-        const body = {prank: "Ha! Gotcha!"}
-        await fetch(`/users/${user.username}`, {
-            method: "POST",
-            body: JSON.stringify(body),
-            headers: {
-                accept: 'application/json'
-            }
-        });
+    async function showMessage(str: string = "Ha! Gotcha!") {
+        const body = {showMessage: str}
+        await api.post(`/users/${user.username}`, body)
+    }
+
+    async function hideUi() {
+        const body = {hideUi: true}
+        await api.post(`/users/${user.username}`, body)
     }
 
     async function deleteUser() {
-        await fetch(`/users/${user.username}`, {
-            method: "DELETE",
-            headers: {
-                accept: 'application/json'
-            }
-        });
+        await api.del(`/users/${user.username}`)
     }
+
+    /*
+    async function refresh() {
+        user = await api.get(`/`)
+    }
+
+    let poller
+    const setupPoller = () => {
+        if (poller) {
+            clearInterval(poller)
+        }
+        poller = setInterval(refresh.bind(this), 2000)
+    }
+
+    $: setupPoller()
+    */
 </script>
 
-<Button on:click={() => goto('/')}>back</Button>
-<h1>{user.username}</h1>
-<label for="remaining">Time Remaining</label>
-<input class="timebox" readonly id="remaining" value="{toTime(user.uptime_seconds)}"/>
+{#if !user}
+    loading
+{:else}
+    <Button on:click={() => goto('/')}>back</Button>
+    <h1>{user.username}</h1>
+    <p>
+        <label for="remaining">Online since</label>
+        <input class="timebox" readonly id="remaining" value="{toTime(user.up_time)}"/>
+    </p>
 
-<div class="container">
-    <Button on:click={()=>updateTime(5)} backgroundColor="{addColor}">
-        <Icon slot="icon" path={mdiPlus}/>
-        5 min
-    </Button>
-    <Button on:click={()=>updateTime(10)} backgroundColor="{addColor}">
-        <Icon slot="icon" path={mdiPlus}/>
-        10 min
-    </Button>
-    <Button on:click={()=>updateTime(10)} backgroundColor="{addColor}">
-        <Icon slot="icon" path={mdiPlus}/>
-        20 min
-    </Button>
-    <Button on:click={()=>updateTime(10)} backgroundColor="{addColor}">
-        <Icon slot="icon" path={mdiPlus}/>
-        30 min
-    </Button>
-</div>
-<div class="container">
-    <Button on:click={()=>updateTime(-5)} backgroundColor="{subColor}">
-        <Icon slot="icon" path={mdiMinus}/>
-        5 min
-    </Button>
-    <Button on:click={()=>updateTime(-10)} backgroundColor="{subColor}">
-        <Icon slot="icon" path={mdiMinus}/>
-        10 min
-    </Button>
-    <Button on:click={()=>updateTime(-10)} backgroundColor="{subColor}">
-        <Icon slot="icon" path={mdiMinus}/>
-        20 min
-    </Button>
-    <Button on:click={()=>updateTime(-10)} backgroundColor="{subColor}">
-        <Icon slot="icon" path={mdiMinus}/>
-        30 min
-    </Button>
-</div>
+    <div class="container">
+        <Button on:click={()=>updateTime(1)} backgroundColor="{addColor}">
+            <Icon slot="icon" path={mdiPlus}/>
+            1 min
+        </Button>
+        <Button on:click={()=>updateTime(5)} backgroundColor="{addColor}">
+            <Icon slot="icon" path={mdiPlus}/>
+            5 min
+        </Button>
+        <Button on:click={()=>updateTime(10)} backgroundColor="{addColor}">
+            <Icon slot="icon" path={mdiPlus}/>
+            10 min
+        </Button>
+        <Button on:click={()=>updateTime(10)} backgroundColor="{addColor}">
+            <Icon slot="icon" path={mdiPlus}/>
+            30 min
+        </Button>
+    </div>
+    <div class="container">
+        <Button on:click={()=>updateTime(-1)} backgroundColor="{subColor}">
+            <Icon slot="icon" path={mdiMinus}/>
+            1 min
+        </Button>
+        <Button on:click={()=>updateTime(-5)} backgroundColor="{subColor}">
+            <Icon slot="icon" path={mdiMinus}/>
+            5 min
+        </Button>
+        <Button on:click={()=>updateTime(-10)} backgroundColor="{subColor}">
+            <Icon slot="icon" path={mdiMinus}/>
+            10 min
+        </Button>
+        <Button on:click={()=>updateTime(-10)} backgroundColor="{subColor}">
+            <Icon slot="icon" path={mdiMinus}/>
+            30 min
+        </Button>
+    </div>
 
-<div class="container">
-    <Button on:click={()=>updateTime(-user.uptime_seconds/60)}>Done for today!</Button>
+    <div class="container">
+        <Button on:click={()=>updateTime(-user.up_time/60)}>Done for today!</Button>
 
-    <Button on:click={()=> prank()}>Prank!</Button>
-</div>
+        <Button on:click={()=> showMessage()}>Show Message</Button>
+        <Button on:click={()=> hideUi()}>Hide UI</Button>
+    </div>
 
-<div class="container">
-    <Button on:click={() => deleteUser()}>
-        <Icon path={mdiTrashCan} slot="icon"/>
-        Delete
-    </Button>
-</div>
+    <div class="container">
+        <Button on:click={() => deleteUser()}>
+            <Icon path={mdiTrashCan} slot="icon"/>
+            Delete
+        </Button>
+    </div>
+{/if}
 
 <style>
     .container {
@@ -106,8 +118,9 @@
     }
 
     .timebox {
-        background: #c5c5c5;
-        font-size: 2rem;
+        display: inline;
+        background: #e5e5e5;
+        font-size: 1.5rem;
         border: 0;
         margin: 1rem
     }

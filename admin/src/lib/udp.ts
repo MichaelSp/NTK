@@ -2,9 +2,11 @@ import {User} from "$lib/db";
 import * as dgram from "dgram";
 
 class Hello {
-    User!: string;
-    Uptime!: string;
+    User!: string
+    Uptime!: string
+    AllowedTime!: string
 }
+const PORT = 6868
 
 const udpSocket = dgram.createSocket("udp4");
 
@@ -17,9 +19,11 @@ export class UDP {
         udpSocket.on("listening", this.listening.bind(this))
     }
 
-    static sendMessage(user: User, message: string) {
-        udpSocket.send(message, 0,
-            message.length, 6868,
+    static sendMessage(user: User, message: string | {}) {
+        const buffer = typeof message === "string" ? message : JSON.stringify(message)
+        console.log("server send", message, `${user.ip}:${PORT+1}`)
+        udpSocket.send(buffer, 0,
+            buffer.length, PORT,
             user.ip, (err) => {
                 if (err) {
                     console.warn("Unable to message. Error:" + err.message, err);
@@ -44,7 +48,8 @@ export class UDP {
         } else {
             await User.upsert({
                     username: username,
-                    uptime_seconds: hello.Uptime,
+                    up_time: hello.Uptime,
+                    allowed_time: hello.AllowedTime,
                     ip: rinfo.address
                 }
             );
@@ -59,7 +64,7 @@ export class UDP {
 
     startUdp() {
         if (!this.running) {
-            udpSocket.bind(6868);
+            udpSocket.bind(PORT);
             this.running = true;
 
             process.on('SIGINT', () => {

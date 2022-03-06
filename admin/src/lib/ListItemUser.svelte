@@ -15,7 +15,7 @@
     <Icon slot="visual" path={mdiAccountCircle}/>
 
     <span slot="primary">{user.username}</span>
-    <span slot="secondary">{toTime(user.uptime_seconds)}</span>
+    <span slot="secondary">{toTime(user.up_time)}</span>
     <span slot="tertiary" class="small">{user.ip}</span>
 </ListItem>
 
