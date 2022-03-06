@@ -1,5 +1,5 @@
 import {User} from "../../lib/db";
-import * as dgram from "dgram";
+import {UDP} from "../../lib/udp";
 
 export async function get({params}): Promise<{ body?: any, status?: number }> {
     const username = params.username
@@ -26,8 +26,6 @@ async function updateTime(data, username: string) {
     return {status: 201, body: {uptime_seconds}};
 }
 
-const udpClient = dgram.createSocket("udp4");
-
 async function prank(username: string, prank: string) {
     let message = JSON.stringify({
         Action: "PRANK",
@@ -35,13 +33,7 @@ async function prank(username: string, prank: string) {
     })
     const user = await User.findByPk(username)
 
-    udpClient.send(message, 0,
-        message.length, 6868,
-        user.ip, (err) => {
-            if (err) {
-                console.warn("Unable to message. Error:" + err.message, err);
-            }
-        });
+    UDP.sendMessage(user, message)
 }
 
 export async function post(p: { request: Request, params: { username?: string } }) {
@@ -58,5 +50,9 @@ export async function post(p: { request: Request, params: { username?: string } 
     } else {
         return {status: 404}
     }
+}
 
+export async function del(p: { request: Request, params: { username?: string } }) {
+    const username = p.params.username
+    await User.destroy({where: {username}})
 }

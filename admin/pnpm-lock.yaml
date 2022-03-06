@@ -7,13 +7,11 @@ specifiers:
   '@capacitor/ios': ^3.4.3
   '@fontsource/fira-mono': ^4.5.3
   '@material-svelte/button': ^1.5.0
-  '@material-svelte/grid': ^1.2.4
   '@material-svelte/icon': ^1.3.4
   '@material-svelte/layout': ^1.3.0
   '@material-svelte/list': ^1.2.4
   '@material-svelte/paper': ^1.2.4
   '@material-svelte/postcss-plugin': ^1.3.2
-  '@material-svelte/text-field': ^1.0.2
   '@material-svelte/top-app-bar': ^1.2.4
   '@material-svelte/typography': ^1.2.4
   '@mdi/js': ^6.5.95
@@ -54,13 +52,11 @@ dependencies:
 
 devDependencies:
   '@material-svelte/button': 1.5.0
-  '@material-svelte/grid': 1.2.4
   '@material-svelte/icon': 1.3.4
   '@material-svelte/layout': 1.3.0
   '@material-svelte/list': 1.2.4
   '@material-svelte/paper': 1.2.4
   '@material-svelte/postcss-plugin': 1.3.2_postcss@8.4.7
-  '@material-svelte/text-field': 1.0.2
   '@material-svelte/top-app-bar': 1.2.4
   '@material-svelte/typography': 1.2.4
   '@mdi/js': 6.5.95
@@ -809,10 +805,6 @@ packages:
       '@material-svelte/typography': 1.2.4
     dev: true
 
-  /@material-svelte/grid/1.2.4:
-    resolution: {integrity: sha512-0xkRWshsbukrcRNA062hSzmQLbyjy71GREGe0Tk2qZAF0STRfoXglRhvr7kcTTansEWikWSmrUsCjqd427hbCw==}
-    dev: true
-
   /@material-svelte/icon/1.3.4:
     resolution: {integrity: sha512-EBuMxhdMk4LLxk0OSWTGArcepKe07e76U2KznOrSczmEu1kDByowid6VTSSigXoiqIyZyw4fj7z7qbMirip3Jg==}
     dev: true
@@ -854,10 +846,6 @@ packages:
 
   /@material-svelte/svelte-actions/1.3.1:
     resolution: {integrity: sha512-E7CnHELLKWuOj63ecNFzo/UsWSdjhKMGrb+iH1l6R4/nMnf9NE0YFLcu4iokcxooBwmU//rKyCrea7mNOwKc+w==}
-    dev: true
-
-  /@material-svelte/text-field/1.0.2:
-    resolution: {integrity: sha512-xz92O7esnOQKu/J6lYsRDBTaFSqeyQ2E9pIbV6ouYx9Aax4Rvq7ZeeG5oErTub6JhugafIYcbFd7bau46xtbZw==}
     dev: true
 
   /@material-svelte/top-app-bar/1.2.4:

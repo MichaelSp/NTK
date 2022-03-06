@@ -2,7 +2,7 @@
     import {Button} from "@material-svelte/button";
     import {goto} from "$app/navigation";
     import {Icon} from "@material-svelte/icon";
-    import {mdiMinus, mdiPlus} from '@mdi/js';
+    import {mdiMinus, mdiPlus, mdiTrashCan} from '@mdi/js';
     import {toTime} from "../../lib/utils";
 
     export let user
@@ -10,7 +10,6 @@
     let subColor = "#7c5959"
 
     async function updateTime(mins: number) {
-        console.log("Upd", mins)
         const body = {uptime_seconds: user.uptime_seconds + mins * 60}
         const response = await fetch(`/users/${user.username}`, {
             method: "POST",
@@ -24,10 +23,19 @@
     }
 
     async function prank() {
-        const body = {prank: "Ha, Gotcha!"}
+        const body = {prank: "Ha! Gotcha!"}
         await fetch(`/users/${user.username}`, {
             method: "POST",
             body: JSON.stringify(body),
+            headers: {
+                accept: 'application/json'
+            }
+        });
+    }
+
+    async function deleteUser() {
+        await fetch(`/users/${user.username}`, {
+            method: "DELETE",
             headers: {
                 accept: 'application/json'
             }
@@ -81,6 +89,13 @@
     <Button on:click={()=>updateTime(-user.uptime_seconds/60)}>Done for today!</Button>
 
     <Button on:click={()=> prank()}>Prank!</Button>
+</div>
+
+<div class="container">
+    <Button on:click={() => deleteUser()}>
+        <Icon path={mdiTrashCan} slot="icon"/>
+        Delete
+    </Button>
 </div>
 
 <style>

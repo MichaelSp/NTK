@@ -1,45 +1,72 @@
-import { User } from "$lib/db";
+import {User} from "$lib/db";
 import * as dgram from "dgram";
 
 class Hello {
-  User!: string;
-  Uptime!: string;
+    User!: string;
+    Uptime!: string;
 }
 
-export const udpServer = dgram.createSocket("udp4");
+const udpSocket = dgram.createSocket("udp4");
 
-udpServer.on("error", (err) => {
-  console.log(`server error:\n${err.stack}`);
-  udpServer.close();
-});
+export class UDP {
+    private running = false;
 
-udpServer.on("message", async (msg: Buffer, rinfo) => {
-  const hello: Hello = JSON.parse(msg.toString("utf8"));
-  await User.upsert({
-      username: hello.User,
-      uptime_seconds: hello.Uptime,
-      ip: rinfo.address
+    constructor() {
+        udpSocket.on("error", this.error.bind(this))
+        udpSocket.on("message", this.receiveMessage.bind(this))
+        udpSocket.on("listening", this.listening.bind(this))
     }
-  );
-  console.log(`server got: ${msg} from ${rinfo.address}:${rinfo.port}`);
-});
 
-udpServer.on("listening", () => {
-  const address = udpServer.address();
-  console.log(`server listening ${address.address}:${address.port}`);
-});
+    static sendMessage(user: User, message: string) {
+        udpSocket.send(message, 0,
+            message.length, 6868,
+            user.ip, (err) => {
+                if (err) {
+                    console.warn("Unable to message. Error:" + err.message, err);
+                }
+            });
+    }
 
-let running = false;
+    static sanitizeName(username: string) {
+        return (username || "").replaceAll(/.*[\\]/g, "");
+    }
 
-export function startUdp() {
-  if (!running) {
-    udpServer.bind(6868);
-    running = true;
-  }
+    error(err) {
+        console.log(`server error:\n${err.stack}`);
+        udpSocket.close();
+    }
+
+    async receiveMessage(msg: Buffer, rinfo) {
+        const hello: Hello = JSON.parse(msg.toString("utf8"));
+        const username = UDP.sanitizeName(hello.User);
+        if (username === "") {
+            return console.warn("Empty user-name")
+        } else {
+            await User.upsert({
+                    username: username,
+                    uptime_seconds: hello.Uptime,
+                    ip: rinfo.address
+                }
+            );
+            console.log(`server got: ${msg} from ${rinfo.address}:${rinfo.port}`);
+        }
+    }
+
+    listening() {
+        const address = udpSocket.address();
+        console.log(`server listening ${address.address}:${address.port}`);
+    }
+
+    startUdp() {
+        if (!this.running) {
+            udpSocket.bind(6868);
+            this.running = true;
+
+            process.on('SIGINT', () => {
+                console.log("Caught interrupt signal. Shutdown");
+                udpSocket.close()
+                process.exit(0)
+            });
+        }
+    }
 }
-
-process.on('SIGINT', () => {
-  console.log("Caught interrupt signal. Shutdown");
-  udpServer.close()
-  process.exit(0)
-});
