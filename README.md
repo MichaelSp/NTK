@@ -1,5 +1,5 @@
 # NTK - Not Today Kids
-[![Github All Releases](https://img.shields.io/github/downloads/elmerhd/ntk/total.svg)](downloads)
+[![Github All Releases](https://img.shields.io/github/downloads/MichaelSp/NTK/total.svg)](https://github.com/MichaelSp/NTK/releases)
 
 Is a windows application that limits kids screen time using computer. prevents them from browsing prohibited websites.
 ## Getting Started
