@@ -57,19 +57,6 @@ namespace NTK
             CountdownTimer = new DispatcherTimer();
             CountdownTimer.Interval = TimeSpan.FromSeconds(1);
             CountdownTimer.Tick += CountdownTimer_Tick;
-<<<<<<< HEAD
-
-            BlockSitesTimer = new Timer();
-            BlockSitesTimer.Interval = 1000; // every second
-            BlockSitesTimer.Elapsed += BlockSitesTimerElapsed;
-            BlockSitesTimer.Start();
-
-            UdpTimer = new Timer();
-            UdpTimer.Interval = 60000; // every minute
-            UdpTimer.Elapsed += UdpTimerElapsed;
-            UdpTimer.Start();
-=======
->>>>>>> 033e3fe (client refactoring)
         }
 
         public void ShowMessage(string message)
@@ -117,19 +104,6 @@ namespace NTK
             }
             else
             {
-<<<<<<< HEAD
-                Config = new Config() { Limit = 10800, Message = "You have used your allotted time for today. Come back tomorrow." };
-                JsonSerializer serializer = new JsonSerializer();
-                serializer.NullValueHandling = NullValueHandling.Ignore;
-                serializer.Formatting = Formatting.Indented;
-                using (StreamWriter sw = new StreamWriter(configFile.FullName))
-                using (JsonWriter writer = new JsonTextWriter(sw))
-                {
-                    serializer.Serialize(writer, Config);
-                    writer.Close();
-                    sw.Close();
-                }
-=======
                 Config = new Config() { Limit = 10800, Message = "You have used your alloted time for today, Come back tomorrow." };
                 writeConfig();
             }
@@ -146,7 +120,6 @@ namespace NTK
                 serializer.Serialize(writer, Config);
                 writer.Close();
                 sw.Close();
->>>>>>> 033e3fe (client refactoring)
             }
         }
 
