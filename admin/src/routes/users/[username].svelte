@@ -2,7 +2,7 @@
     import {Button} from "@material-svelte/button";
     import {goto} from "$app/navigation";
     import {Icon} from "@material-svelte/icon";
-    import {mdiMinus, mdiPlus, mdiTrashCan} from '@mdi/js';
+    import {mdiContentSave, mdiMinus, mdiPlus, mdiTrashCan} from '@mdi/js';
     import {toTime} from "../../lib/utils";
     import {API} from "../../lib/api";
 
@@ -31,6 +31,10 @@
         await api.del(`/users/${user.username}`)
     }
 
+    async function saveChangedTimes() {
+        await api.post(`/users/${user.username}`, {saveChangedTimes: true})
+    }
+
     /*
     async function refresh() {
         user = await api.get(`/`)
@@ -49,14 +53,24 @@
 </script>
 
 {#if !user}
-    loading
+    No one is online
 {:else}
     <Button on:click={() => goto('/')}>back</Button>
     <h1>{user.username}</h1>
-    <p>
-        <label for="remaining">Online since</label>
-        <input class="timebox" readonly id="remaining" value="{toTime(user.up_time)}"/>
-    </p>
+    <div class="container">
+        <p>
+            <label for="uptime">Online since</label>
+            <input class="timebox" readonly id="uptime" value="{toTime(user.up_time)}"/>
+            <span>Remaining: {toTime((user.allowed_time || 0)- user.up_time)}</span>
+        </p>
+        <p>
+            <label for="allowed">Allowed time</label>
+            <input class="timebox" readonly id="allowed" value="{toTime(user.allowed_time || 0)}"/>
+            <Button on:click={() => saveChangedTimes()}>
+                <Icon slot="icon" path="{mdiContentSave}" />
+            </Button>
+        </p>
+    </div>
 
     <div class="container">
         <Button on:click={()=>updateTime(1)} backgroundColor="{addColor}">

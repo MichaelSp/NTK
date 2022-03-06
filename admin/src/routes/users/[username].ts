@@ -54,6 +54,10 @@ export async function post(p: { request: Request, params: { username?: string } 
             UDP.sendMessage(await User.findByPk(username), {Action: "HIDE_UI"})
             return {status: 200}
         }
+        if (data.saveChangedTimes) {
+            UDP.sendMessage(await User.findByPk(username), {Action: "SAVE_CHANGED_TIMES"})
+            return {status: 200}
+        }
         if (data.showImage) {
             return await showMessage(username, data.showImage, "SHOW_IMAGE")
         }
