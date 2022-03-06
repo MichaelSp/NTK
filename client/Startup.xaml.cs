@@ -38,6 +38,8 @@ namespace NTK
         private SiteBlocker siteBlocker;
         private UDPServer udpServer;
 
+        private TimerWindow TimerWindow;
+
         public Startup()
         {
             InitializeComponent();
@@ -57,6 +59,11 @@ namespace NTK
             CountdownTimer = new DispatcherTimer();
             CountdownTimer.Interval = TimeSpan.FromSeconds(1);
             CountdownTimer.Tick += CountdownTimer_Tick;
+
+            TimerWindow = new TimerWindow();
+            if (Config.ShowTimerWindow){
+                TimerWindow.Show();
+            }
         }
 
         public void ShowMessage(string message)
@@ -79,6 +86,7 @@ namespace NTK
 
         private void CountdownTimer_Tick(object sender, EventArgs e)
         {
+            TimerWindow.Hide();
             FrameGrid.Background = new SolidColorBrush(Colors.White);
             lblShutdownTimer.Visibility = Visibility.Visible;
             lblMessage.Visibility = Visibility.Visible;
@@ -176,6 +184,8 @@ namespace NTK
                 writer.Close();
                 sw.Close();
             }
+            int timeRemaining = GetTimeAllowed() -  _timeConsumed;
+            TimerWindow.setTimeRemaining( timeRemaining );
         }
 
         /// <summary>
@@ -205,10 +215,12 @@ namespace NTK
             e.Cancel = true;
         }
 
-        public void UpdateTimeAllowed(int newTime)
+        public void UpdateTimeAllowed(int newTime, bool save=false)
         {
             this.Config.Limit = newTime;
-            writeConfig();
+            if (save){
+               writeConfig();
+            }
         }
 
         public int GetTimeAllowed()

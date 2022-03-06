@@ -11,6 +11,11 @@ namespace NTK {
         /// The message
         /// </summary>
         public string Message { get; set; }
+
+        /// <summary>
+        /// Show a small window that counts down the remaining time
+        /// </summary>
+        public bool ShowTimerWindow{ get; set; } 
     }
     
 }

@@ -16,7 +16,7 @@ namespace NTK
 
         public void UpdateTimeConsumed(int newTime);
 
-        public void UpdateTimeAllowed(int newTime);
+        public void UpdateTimeAllowed(int newTime, bool save=false);
     }
 
     public class UDPServer : DispatcherObject
@@ -33,6 +33,8 @@ namespace NTK
 
         public const string SHOW_IMAGE = "SHOW_IMAGE";
 
+        private const string SAVE_CHANGED_TIMES = "SAVE_CHANGED_TIMES";
+
         public Timer UdpTimer;
 
         private Timer ServerTimer { get; set; }
@@ -43,8 +45,6 @@ namespace NTK
         private const int PORT = 6868;
 
         public UdpClient UdpClient = new UdpClient();
-
-
 
         public UDPServer(TimeControl timeControl)
         {
@@ -109,6 +109,8 @@ namespace NTK
             else if (serverRequest.Action == SHOW_IMAGE)
             {
                 this.ui.ShowImageFromUrl(new Uri(serverRequest.Message));
+            } else if (serverRequest.Action == SAVE_CHANGED_TIMES){
+                this.ui.UpdateTimeAllowed(this.ui.GetTimeAllowed(), true);
             }
         }
 
