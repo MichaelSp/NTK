@@ -19,12 +19,13 @@
 body {
 	min-height: 100vh;
 	margin: 0;
-	background: var(--primary-color) linear-gradient(
+	background: var(--primary-color)
+		linear-gradient(
 			180deg,
 			var(--primary-color) 0%,
 			var(--secondary-color) 10.45%,
 			var(--tertiary-color) 41.35%
-	);
+		);
 }
 
 body::before {

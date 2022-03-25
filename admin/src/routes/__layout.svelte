@@ -1,18 +1,16 @@
-<script lang="ts">
-	import {Layout} from '@material-svelte/layout';
+<script>
 	import '../app.css';
 </script>
 
-
-<Layout>
+<div>
 	<main>
-		<slot/>
+		<slot />
 	</main>
 
 	<footer>
 		<p>Not Today Kids</p>
 	</footer>
-</Layout>
+</div>
 
 <style>
 	main {

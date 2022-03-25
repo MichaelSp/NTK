@@ -1,42 +1,68 @@
-interface sendOptions {
-    method: string
-    path: string
-    data?: string
+import { UDP } from '@frontall/capacitor-udp';
+import type { ReceiveUdpEvent, User } from './utils';
+
+export class Action {
+	Action:
+		| 'ADDTIME'
+		| 'SHOWUI'
+		| 'SHOW_IMAGE' // with Message
+		| 'BLOCKTODAY'
+		| 'RESETTIME'
+		| 'HIDEUI'
+		| 'SAVE_CHANGED_TIMES'; // without Message
+	Message?: string;
+}
+
+interface SocketInfo {
+	socketId: number;
+	ipv4: string;
+	ipv6: string;
+}
+
+export class Datagram<T> {
+	constructor(public readonly data: T, public readonly sender: string) {}
 }
 
 export class API {
-    async send<T>(sendOpts: sendOptions): Promise<T | string> {
-        const opts: RequestInit = {method: sendOpts.method, headers: {}};
+	private socket: SocketInfo;
 
-        if (sendOpts.data) {
-            opts.headers['Content-Type'] = 'application/json';
-            opts.body = JSON.stringify(sendOpts.data);
-        }
+	constructor(private readonly port) {}
 
-        return await fetch(sendOpts.path, opts)
-            .then((r) => r.text())
-            .then((json) => {
-                try {
-                    return JSON.parse(json);
-                } catch (err) {
-                    return json;
-                }
-            });
-    }
+	async sendTo<T extends Action>(user: User, message: T | string): Promise<any> {
+		const buffer = typeof message === 'string' ? message : JSON.stringify(message);
+		return UDP.send({
+			socketId: this.socketId,
+			address: user.ip,
+			port: this.port,
+			buffer: btoa(buffer)
+		});
+	}
 
-    async get(path) {
-        return this.send({method: 'GET', path});
-    }
+	get socketId() {
+		return this.socket.socketId;
+	}
 
-    async del(path) {
-        return this.send({method: 'DELETE', path});
-    }
+	async listen<T>(dataCallback: (data: Datagram<T>) => void, errorCallback: (err: string) => void) {
+		try {
+			this.socket = await UDP.create();
+			await UDP.setBroadcast({ socketId: this.socketId, enabled: false });
+			await UDP.bind({ socketId: this.socketId, address: '0.0.0.0', port: this.port });
+			await UDP.addListener('receive', (params: ReceiveUdpEvent) => {
+				const msg = JSON.parse(atob(params.buffer));
+				dataCallback(new Datagram<T>(msg, params.remoteAddress));
+			});
+			await UDP.addListener('receiveError', (e) => {
+				errorCallback(e);
+			});
+		} catch (e) {
+			errorCallback(e);
+		}
+	}
 
-    async post<T>(path, data): Promise<T | string> {
-        return this.send<T>({method: 'POST', path, data});
-    }
-
-    async put(path, data) {
-        return this.send({method: 'PUT', path, data});
-    }
+	async stop() {
+		if (this.socket) {
+			await UDP.close({ socketId: this.socketId });
+			this.socket = null;
+		}
+	}
 }
