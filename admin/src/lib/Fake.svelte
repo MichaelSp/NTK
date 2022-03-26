@@ -1,6 +1,5 @@
 <script lang="ts">
 	import { Button } from '@material-svelte/button';
-	import { FakeClient } from '$lib/fake-client';
 	import { UDP } from '@frontall/capacitor-udp';
 	import { Hello, toTime } from './utils';
 	import { onDestroy } from 'svelte';

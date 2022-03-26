@@ -4,7 +4,7 @@ const config: CapacitorConfig = {
 	appId: 'net.ntk.admin',
 	appName: 'NTK Admin',
 	webDir: 'build',
-	bundledWebRuntime: false,
+	bundledWebRuntime: true,
 	plugins: {
 		SplashScreen: {
 			launchShowDuration: 0

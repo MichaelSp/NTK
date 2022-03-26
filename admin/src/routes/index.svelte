@@ -1,26 +1,18 @@
-<script context="module">
-	import { List } from '@material-svelte/list';
-	import ListItemUser from '../lib/ListItemUser.svelte';
-	import Fake from '../lib/Fake.svelte';
-
-	import { browser, dev } from '$app/env';
-
-	// we don't need any JS on this page, though we'll load
-	// it in dev so that we get hot module replacement...
-	export const hydrate = dev;
-
-	// ...but if the client-side router is already loaded
-	// (i.e. we came here from elsewhere in the app), use it
-	export const router = browser;
+<script context="module" lang="ts">
+	export const prerender = true;
 </script>
 
 <script lang="ts">
 	import { onMount, onDestroy } from 'svelte';
+	import { List } from '@material-svelte/list';
+	import ListItemUser from '../lib/ListItemUser.svelte';
+	import Fake from '../lib/Fake.svelte';
 	import { Paper } from '@material-svelte/paper';
-	import { Hello, sanitizeName, User } from '../lib/utils';
-	import { API, Datagram } from '../lib/api';
-	import { users } from '../lib/users';
-	import UserView from '../lib/UserView.svelte';
+	import { Hello, sanitizeName, User } from '$lib/utils';
+	import { API, Datagram } from '$lib/api';
+	import { users } from '$lib/users';
+	import UserView from '$lib/UserView.svelte';
+	import { dev } from '$app/env';
 
 	let user: User = null;
 	let err = '';
